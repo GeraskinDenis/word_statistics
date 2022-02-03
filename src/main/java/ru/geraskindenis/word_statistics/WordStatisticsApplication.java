@@ -7,9 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.geraskindenis.word_statistics.db.Person;
 import ru.geraskindenis.word_statistics.db.StatisticsRecord;
-import ru.geraskindenis.word_statistics.db.repository.PersonRep;
 import ru.geraskindenis.word_statistics.db.repository.StatisticsRecordRep;
 
 import java.io.IOException;
@@ -22,19 +20,18 @@ import java.util.Map;
 public class WordStatisticsApplication {
 
     @Autowired
-    private PersonRep personRep;
-
-    @Autowired
     private StatisticsRecordRep statisticsRecord;
 
     public static void main(String[] args) {
+
+
         SpringApplication.run(WordStatisticsApplication.class, args);
 
         // Получаем текст из интернета
-        String html = "https://www.simbirsoft.com/";
+        String url = "https://www.simbirsoft.com/";
         Document document;
         try {
-            document = Jsoup.connect(html).get();
+            document = Jsoup.connect(url).get();
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -57,11 +54,6 @@ public class WordStatisticsApplication {
             map.put(s, (integer == null) ? 1 : ++integer);
         }
         System.out.println(map);
-    }
-
-    @RequestMapping("create-person")
-    public Person createPerson() {
-        return personRep.save(new Person());
     }
 
     @RequestMapping("create-statistics_record")
