@@ -1,7 +1,5 @@
 package ru.geraskindenis.word_statistics;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,8 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.geraskindenis.word_statistics.db.StatisticsRecord;
 import ru.geraskindenis.word_statistics.db.repository.StatisticsRecordRep;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 @SpringBootApplication
@@ -24,40 +20,30 @@ public class WordStatisticsApplication {
 
     public static void main(String[] args) {
 
+        String url = "";
+
+        if (args.length != 1) {
+            url = "https://www.simbirsoft.com/";
+        } else {
+            url = args[0];
+        }
 
         SpringApplication.run(WordStatisticsApplication.class, args);
 
-        // Получаем текст из интернета
-        String url = "https://www.simbirsoft.com/";
-        Document document;
-        try {
-            document = Jsoup.connect(url).get();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-        String text = document.text();
-
+        String text = HTMLParser.getText(url);
         // Удаляем все знаки препинания, телефоны, даты
         String tmp = "[,\"«»()©'\\[\\]:%]|\\s-\\s|\\.(?=\\s)|\\d{2}\\.\\d{2}\\.\\d{4}|(?<=\\s)\\d+(?=\\s)|\\d-\\d{3}-\\d{3}-\\d{4}|\\.$|—";
-        String text2 = text.replaceAll(tmp, "");
-//        System.out.println(text2);
+        text = text.replaceAll(tmp, "");
+        Map<String, Integer> statistics = WordStatistics.getNumberOfRepetitions(text);
 
-        // Получаем массив слов
-        String[] strings = text2.split("\\s+");
-//		Arrays.stream(strings).forEach(System.out::println);
+        // Вывод в консоль статистики
+//        System.out.println(statistics);
 
-        // Получаем статистику
-        Map<String, Integer> map = new HashMap<>();
-        for (String s : strings) {
-            Integer integer = map.get(s);
-            map.put(s, (integer == null) ? 1 : ++integer);
-        }
-        System.out.println(map);
+        // Запись статистики в БД
     }
 
     @RequestMapping("create-statistics_record")
-    public StatisticsRecord createStatisticsRecord(){
+    public StatisticsRecord createStatisticsRecord() {
         return statisticsRecord.save(new StatisticsRecord());
     }
 }

@@ -22,6 +22,12 @@ public class StatisticsRecord {
     public StatisticsRecord() {
     }
 
+    public StatisticsRecord(String url, String word, Integer quantity) {
+        this.url = url;
+        this.word = word;
+        this.quantity = quantity;
+    }
+
     public Long getId() {
         return id;
     }
