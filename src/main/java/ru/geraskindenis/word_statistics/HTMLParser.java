@@ -6,14 +6,9 @@ import org.jsoup.nodes.Document;
 import java.io.IOException;
 
 public class HTMLParser {
-    public static String getText(String url) {
+    public static String getText(String url) throws IOException {
         Document document;
-        try {
-            document = Jsoup.connect(url).get();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
+        document = Jsoup.connect(url).get();
         return document.text();
     }
 }
